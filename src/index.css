@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* Syncora design tokens — "Ember" dark theme.
+   Use as bg-canvas, bg-surface, text-ink, text-muted, border-line, bg-brand + text-on-brand, … */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: #ff8a3d;        /* ember orange — primary actions, progress, done */
+  --color-on-brand: #2a1405;     /* text/icons on brand */
+  --color-brand-soft: #3a2416;   /* tinted chips, avatar fills */
+  --color-brand-ink: #ffb98a;    /* text on brand-soft */
+
+  --color-canvas: #151210;       /* app background */
+  --color-surface: #1e1a17;      /* cards */
+  --color-sunken: #191613;       /* completed rows, inputs */
+  --color-raised: #2a221c;       /* chips, nav bar, hover */
+  --color-ink: #f4eee7;          /* main text */
+  --color-muted: #a99d92;        /* secondary text */
+  --color-line: #2c2622;         /* borders, dividers */
+
+  --color-done: #ff8a3d;         /* completed checkmark (same as brand) */
+  --color-warn: #ffb366;         /* overdue, votes */
+  --color-danger: #f87171;       /* destructive text */
+  --color-danger-strong: #dc2626;/* destructive buttons (white text) */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  color-scheme: dark; /* native date pickers, selects, scrollbars match */
+}
+
+body {
+  @apply bg-canvas text-ink font-sans antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::placeholder {
+  color: var(--color-muted);
+  opacity: 0.8;
+}
+
+/* iOS zooms the page when focusing a field smaller than 16px. */
+@media (max-width: 639px) {
+  :is(input, select, textarea):is(.text-xs, .text-sm) {
+    font-size: 16px !important;
+  }
+}
+
+/* Respect "reduce motion" settings. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
