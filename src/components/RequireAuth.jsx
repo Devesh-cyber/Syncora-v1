@@ -6,7 +6,8 @@ import { FullScreenSpinner, FullScreenMessage } from './FullScreen.jsx'
 // - not configured  → setup hint
 // - signed out      → /signin (remembers where you were going)
 // - not onboarded   → /welcome (unless this route *is* the welcome screen)
-export default function RequireAuth({ allowUnonboarded = false, children }) {
+// - tour not seen   → /tour    (only when the 009 column exists: tour_seen === false)
+export default function RequireAuth({ allowUnonboarded = false, allowUntoured = false, children }) {
   const { configured, session, profile, profileError, loading, reloadProfile, signOut } = useAuth()
   const location = useLocation()
 
@@ -43,6 +44,10 @@ export default function RequireAuth({ allowUnonboarded = false, children }) {
 
   if (!profile.onboarded && !allowUnonboarded) {
     return <Navigate to="/welcome" replace />
+  }
+
+  if (profile.onboarded && profile.tour_seen === false && !allowUntoured && !allowUnonboarded) {
+    return <Navigate to="/tour" replace />
   }
 
   return children ?? <Outlet />

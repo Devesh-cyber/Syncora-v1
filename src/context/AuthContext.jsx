@@ -98,6 +98,15 @@ export function AuthProvider({ children }) {
     [userId],
   )
 
+  // Marks the welcome tour as seen. Updates the screen first, so a failed
+  // save (or a database without the 009 migration) never traps anyone in it.
+  const markTourSeen = useCallback(async () => {
+    setProfile((p) => (p ? { ...p, tour_seen: true } : p))
+    if (!userId) return
+    const { error } = await supabase.from('profiles').update({ tour_seen: true }).eq('id', userId)
+    if (error) console.warn('Could not save tour_seen:', error.message)
+  }, [userId])
+
   // Read-only on purpose (safe to call during render). It's overwritten
   // on the next sign-in, so a stale value is harmless.
   const getReturnTo = useCallback(() => {
@@ -123,6 +132,7 @@ export function AuthProvider({ children }) {
     updateProfile,
     reloadProfile: loadProfile,
     getReturnTo,
+    markTourSeen,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

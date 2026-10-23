@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import ProfileForm from '../components/ProfileForm.jsx'
 import InstallCard from '../components/InstallCard.jsx'
@@ -66,6 +67,20 @@ export default function Profile() {
         </div>
         {reminderError && <p className="mt-2 text-sm text-danger">{reminderError}</p>}
       </section>
+
+      <Link
+        to="/tour?replay=1"
+        className="flex items-center gap-3 rounded-2xl bg-surface p-5 transition hover:bg-raised"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-lg" aria-hidden="true">
+          🧭
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">How Syncora works</span>
+          <span className="block text-sm text-muted">A 30-second tour of rooms, tasks, cheers and streaks</span>
+        </span>
+        <span className="text-muted" aria-hidden="true">›</span>
+      </Link>
 
       <InstallCard />
 

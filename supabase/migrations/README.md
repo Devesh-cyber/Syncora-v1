@@ -8,5 +8,6 @@ Run these files in order in Supabase → SQL Editor. Each phase adds one:
 - 007_deletion_votes.sql    (Phase 7) ✅ included
 - 008_realtime.sql          (Phase 8) ✅ included
 - (Phase 9 needs no SQL)
+- 009_onboarding.sql        (v1.2 onboarding) ✅ included
 
 No SQL is needed for Phase 1.

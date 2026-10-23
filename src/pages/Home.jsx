@@ -15,6 +15,7 @@ import { getMyStreak } from '../lib/streaks.js'
 import { useLiveRefresh } from '../lib/useLiveRefresh.js'
 import ReminderBanner from '../components/ReminderBanner.jsx'
 import InstallCard from '../components/InstallCard.jsx'
+import GettingStarted from '../components/GettingStarted.jsx'
 import { Card, ErrorNote, Spinner } from '../components/ui.jsx'
 
 const LAST_ROOM_KEY = 'syncora:lastRoom'
@@ -185,25 +186,33 @@ export default function Home() {
         <ReminderBanner enabled={profile.reminders_enabled} pendingToday={todo.length} streak={streak} />
       )}
 
-      {rooms.length === 0 ? (
-        <Card className="text-center">
-          <p className="text-3xl" aria-hidden="true">👋</p>
-          <h2 className="mt-2 font-semibold">Start with a room</h2>
-          <p className="mt-1 text-sm text-muted">Tasks live inside rooms. Create one for your crew, or join a friend's.</p>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <Link to="/rooms/new" className="rounded-xl bg-brand px-4 py-3 font-semibold text-on-brand">
-              Create room
-            </Link>
-            <Link to="/rooms/join" className="rounded-xl border border-line px-4 py-3 font-semibold">
-              Join with code
-            </Link>
-          </div>
-        </Card>
-      ) : (
+      {/* First-run checklist: always when roomless; otherwise until the first
+          completed task (needs the streak to know, so it waits for it). */}
+      {(rooms.length === 0 || streak) && (
+        <GettingStarted
+          hasRoom={rooms.length > 0}
+          hasTask={tasks.length > 0}
+          hasDone={doneToday.length > 0 || (streak?.best_streak ?? 0) > 0}
+          onAddTask={() => {
+            const input = document.getElementById('home-new-task')
+            input?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            input?.focus({ preventScroll: true })
+          }}
+        />
+      )}
+
+      {rooms.length === 0 ? null : (
         <>
           {/* Today */}
           <section className="space-y-2">
-            <TaskComposer onAdd={handleAdd} rooms={rooms} roomId={selectedRoomId} onRoomChange={handleRoomChange} />
+            <TaskComposer
+              onAdd={handleAdd}
+              rooms={rooms}
+              roomId={selectedRoomId}
+              onRoomChange={handleRoomChange}
+              inputId="home-new-task"
+              placeholder={tasks.length === 0 ? 'Try: Revise chapter 4' : "What's next?"}
+            />
 
             <h2 className="px-1 pt-3 text-xl font-extrabold">Today</h2>
 

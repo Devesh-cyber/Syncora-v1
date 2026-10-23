@@ -67,3 +67,15 @@ h2 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Welcome tour card entrance */
+@keyframes tour-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

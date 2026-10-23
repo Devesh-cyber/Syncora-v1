@@ -213,6 +213,10 @@ export default function RoomDetail() {
         <VotePanel request={request} room={room} meId={user.id} onVote={handleVote} onCancel={handleCancelVote} />
       )}
 
+      {memberCount === 1 && (
+        <InviteCard code={room.join_code} roomName={room.name} isAdmin={isAdmin} onRegenerate={askRegenerate} prominent />
+      )}
+
       <RoomTasks room={room} currentUserId={user.id} liveKey={liveKey} onChange={() => setActivityKey((k) => k + 1)} />
 
       <RoomActivity
@@ -253,7 +257,9 @@ export default function RoomDetail() {
         </ul>
       </Card>
 
-      <InviteCard code={room.join_code} roomName={room.name} isAdmin={isAdmin} onRegenerate={askRegenerate} />
+      {memberCount > 1 && (
+        <InviteCard code={room.join_code} roomName={room.name} isAdmin={isAdmin} onRegenerate={askRegenerate} />
+      )}
 
       <div className="pt-2">
         {isAdmin ? (
@@ -356,13 +362,18 @@ function RoomHeader({ room, isAdmin, memberCount, onSaved }) {
   )
 }
 
-function InviteCard({ code, roomName, isAdmin, onRegenerate }) {
+// prominent: the "Invite your crew" version shown at the top while you're
+// alone in the room. The shared text explains Syncora to people who've
+// never heard of it, and the link drops them straight into this room.
+function InviteCard({ code, roomName, isAdmin, onRegenerate, prominent = false }) {
   const [copied, setCopied] = useState(false)
   const canShare = typeof navigator !== 'undefined' && Boolean(navigator.share)
+  const link = joinLink(code)
+  const message = `Join my room "${roomName}" on Syncora — we keep our task lists together and cheer each other on. Tap to join: ${link} (code ${formatCode(code)})`
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(formatCode(code))
+      await navigator.clipboard.writeText(message)
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
     } catch {
@@ -374,8 +385,8 @@ function InviteCard({ code, roomName, isAdmin, onRegenerate }) {
     try {
       await navigator.share({
         title: `Join ${roomName} on Syncora`,
-        text: `Join "${roomName}" on Syncora with code ${formatCode(code)}`,
-        url: joinLink(code),
+        text: `Join my room "${roomName}" on Syncora — we keep our task lists together and cheer each other on. Code: ${formatCode(code)}`,
+        url: link,
       })
     } catch {
       /* user cancelled */
@@ -383,19 +394,28 @@ function InviteCard({ code, roomName, isAdmin, onRegenerate }) {
   }
 
   return (
-    <Card>
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold">Room code</h2>
+    <Card className={prominent ? '!bg-brand-soft' : ''}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className={prominent ? 'text-xl font-extrabold' : 'font-semibold'}>
+            {prominent ? 'Invite your crew' : 'Room code'}
+          </h2>
+          {prominent && (
+            <p className="mt-1 text-sm text-brand-ink">
+              Syncora works best together. Send the invite — friends sign in with Google and land straight in this room.
+            </p>
+          )}
+        </div>
         {isAdmin && (
-          <button onClick={onRegenerate} className="text-sm font-semibold text-muted hover:text-ink">
+          <button onClick={onRegenerate} className="shrink-0 text-sm font-semibold text-muted hover:text-ink">
             New code
           </button>
         )}
       </div>
-      <p className="mt-3 text-center font-mono text-3xl font-semibold tracking-[0.2em] select-all">{formatCode(code)}</p>
+      <p className="mt-4 text-center font-mono text-3xl font-semibold tracking-[0.2em] select-all">{formatCode(code)}</p>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <SecondaryButton onClick={copy} className={canShare ? '' : 'col-span-2'}>
-          {copied ? 'Copied ✓' : 'Copy code'}
+          {copied ? 'Copied ✓' : 'Copy invite'}
         </SecondaryButton>
         {canShare && <PrimaryButton onClick={share}>Share</PrimaryButton>}
       </div>

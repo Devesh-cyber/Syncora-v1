@@ -198,11 +198,13 @@ function MemberTasks({ member, isMe, pending, completed, footerFor, onAdd, onTog
 
   return (
     <section role="tabpanel" aria-label={isMe ? 'Your tasks' : `${member.display_name}'s tasks`} className="space-y-2">
-      {isMe && <TaskComposer onAdd={onAdd} />}
+      {isMe && <TaskComposer onAdd={onAdd} placeholder={total === 0 ? 'Try: Revise chapter 4' : "What's next?"} />}
 
       {total === 0 && (
         <p className="rounded-2xl bg-surface px-4 py-4 text-sm text-muted">
-          {isMe ? 'Nothing here yet — add your first task above.' : `${member.display_name} hasn't added any tasks yet.`}
+          {isMe
+            ? 'Nothing here yet. Add a task above — pick Today or a date, then tick it off when it’s done. Your room sees it.'
+            : `${member.display_name} hasn't added any tasks yet.`}
         </p>
       )}
 

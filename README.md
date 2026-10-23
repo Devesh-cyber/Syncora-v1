@@ -50,6 +50,11 @@ Syncora sits in between: **individual ownership, shared visibility, friendly acc
 - Otherwise the room **votes** for 48 hours: it's deleted only if more than half say yes
 - If an admin wants to *leave* and the vote fails, admin passes to the longest-standing member
 
+**Easy to start**
+- The sign-in page explains the app in three lines; people arriving from an invite link see *"You've been invited to a room"*
+- A 4-card **"How Syncora works"** tour after the first sign-in (skippable, replayable from Profile), ending in *Create a room* / *Join with a code*, or straight into the room they were invited to
+- A self-ticking **Getting started** checklist on Home until the first task is done, and an **Invite your crew** card while you're alone in a room
+
 **Live and installable**
 - Every screen updates in real time when someone else changes something
 - Installable as an app on Android, iPhone and desktop; opens offline with a clear "you're offline" strip
@@ -164,8 +169,9 @@ In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in ord
 | `006_reactions_streaks.sql` | Cheers and streak functions |
 | `007_deletion_votes.sql` | Room deletion votes |
 | `008_realtime.sql` | Realtime publication |
+| `009_onboarding.sql` | "Tour seen" flag for the welcome tour |
 
-The numbers follow the build phases; phases 1, 5 and 9 needed no SQL, so there are no 001, 005 or 009 files. Optional: the last lines of `007_deletion_votes.sql` show how to close expired votes in the background with `pg_cron`. Without it, a vote is settled when someone next opens the room.
+The numbers follow the build phases; phases 1 and 5 needed no SQL, so there are no 001 or 005 files. Optional: the last lines of `007_deletion_votes.sql` show how to close expired votes in the background with `pg_cron`. Without it, a vote is settled when someone next opens the room.
 
 ### 3. Enable Google sign-in
 

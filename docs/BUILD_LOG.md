@@ -335,3 +335,23 @@ src/
 supabase/migrations/       SQL files, one per database phase
 public/                    PWA manifest, icons, service worker (sw.js)
 ```
+
+
+---
+
+## v1.2 — Onboarding
+
+**Why:** people opening a shared link didn't know what Syncora was or where to start.
+
+### Run the migration
+Supabase → SQL Editor → paste `supabase/migrations/009_onboarding.sql` → Run. It adds `profiles.tour_seen` (default `false`), so **everyone — including existing users — sees the tour once**. Without it the app still works; the tour just never auto-shows.
+
+### Checklist
+- [ ] Signed out at `/signin`: three feature lines under the logo
+- [ ] Open a join link signed out → "You've been invited to a room" banner, button says "Continue with Google to join"
+- [ ] New account → profile step → 4-card tour (swipe, arrows, dots, Skip) → last card offers Create / Join
+- [ ] Via an invite link → last card says "Join the room you were invited to" → lands on the join screen with the code filled in
+- [ ] Tour doesn't reappear after a refresh or on another device
+- [ ] Profile → **How Syncora works** replays it and returns to Profile
+- [ ] Account with no rooms → Home shows **Getting started** (3 steps); each step ticks as you go; card disappears after the first completed task (or **Hide**)
+- [ ] Alone in a room → **Invite your crew** card at the top; **Copy invite** copies a message that explains Syncora + the join link

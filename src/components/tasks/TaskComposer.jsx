@@ -4,7 +4,9 @@ import { addDaysISO, dueInfo, todayISO } from '../../lib/dates.js'
 
 // Quick "add a task" row: type, optionally pick a due date, press Enter.
 // Optional room picker (Home dashboard): pass rooms, roomId and onRoomChange.
-export default function TaskComposer({ onAdd, rooms = null, roomId = null, onRoomChange }) {
+// inputId: lets other parts of the page focus the field (Home's Getting started).
+// placeholder: hint text, e.g. an example task for first-timers.
+export default function TaskComposer({ onAdd, rooms = null, roomId = null, onRoomChange, inputId, placeholder = "What's next?" }) {
   const [title, setTitle] = useState('')
   const [dueDate, setDueDate] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -64,7 +66,8 @@ export default function TaskComposer({ onAdd, rooms = null, roomId = null, onRoo
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={MAX_TASK_TITLE}
-          placeholder="What's next?"
+          id={inputId}
+          placeholder={placeholder}
           aria-label="New task"
           className="min-w-0 flex-1 bg-transparent px-2.5 py-2.5 text-[15px] outline-none"
         />

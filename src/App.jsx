@@ -10,6 +10,7 @@ import Activity from './pages/Activity.jsx'
 import Profile from './pages/Profile.jsx'
 import SignIn from './pages/SignIn.jsx'
 import Welcome from './pages/Welcome.jsx'
+import Tour from './pages/Tour.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 export default function App() {
@@ -21,6 +22,14 @@ export default function App() {
         element={
           <RequireAuth allowUnonboarded>
             <Welcome />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/tour"
+        element={
+          <RequireAuth allowUntoured>
+            <Tour />
           </RequireAuth>
         }
       />
