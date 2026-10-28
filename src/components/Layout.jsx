@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import Avatar from './Avatar.jsx'
+import ReminderToasts from './calendar/ReminderToasts.jsx'
 
 const tabs = [
   { to: '/', label: 'Home', icon: HomeIcon, end: true },
@@ -30,6 +31,8 @@ export default function Layout() {
           <Avatar name={profile.display_name} url={profile.avatar_url} size={36} rounded="xl" />
         </Link>
       </header>
+
+      <ReminderToasts />
 
       <main className="flex-1 px-4 pb-32">
         <Outlet />

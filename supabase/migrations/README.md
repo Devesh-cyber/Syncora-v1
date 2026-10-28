@@ -9,5 +9,6 @@ Run these files in order in Supabase → SQL Editor. Each phase adds one:
 - 008_realtime.sql          (Phase 8) ✅ included
 - (Phase 9 needs no SQL)
 - 009_onboarding.sql        (v1.2 onboarding) ✅ included
+- 010_calendar.sql          (v1.3 calendar + reminders) ✅ included — then see docs/REMINDERS_SETUP.md
 
 No SQL is needed for Phase 1.

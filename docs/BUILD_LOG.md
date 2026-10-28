@@ -355,3 +355,24 @@ Supabase → SQL Editor → paste `supabase/migrations/009_onboarding.sql` → R
 - [ ] Profile → **How Syncora works** replays it and returns to Profile
 - [ ] Account with no rooms → Home shows **Getting started** (3 steps); each step ticks as you go; card disappears after the first completed task (or **Hide**)
 - [ ] Alone in a room → **Invite your crew** card at the top; **Copy invite** copies a message that explains Syncora + the join link
+
+
+---
+
+## v1.3 — Room calendar + push reminders
+
+**Decisions:** any member adds events · creator or admin edits/deletes · events stay when their creator leaves · everyone is reminded unless they mute the room · no repeating events yet · real push notifications.
+
+**Setup:** run `010_calendar.sql`, then follow [`REMINDERS_SETUP.md`](REMINDERS_SETUP.md) for keys, the `send-reminders` Edge Function and the every-minute schedule.
+
+### Checklist
+- [ ] Room → **Calendar** tab → month view; ‹ › change month, **Today** jumps back
+- [ ] Tap a day → **Add event** → title, description, date, time / All day, reminder → it appears with a dot on that day, for every member, live
+- [ ] Creator and admin see **Edit**; others don't (and the database refuses their edits)
+- [ ] All-day events offer "Morning of (9 AM)" / "Day before (9 AM)"
+- [ ] Room feed shows "X added 'Event' · Fri 30 Oct, 6:00 PM"; Home shows **Upcoming** across rooms
+- [ ] Profile → **Calendar reminders** on → **Send a test notification** shows one
+- [ ] Event 3 min ahead with "At start", app closed → notification arrives ~on time; tap opens that day
+- [ ] **Mute reminders for this room** → that member stops getting them
+- [ ] Without push on: with the app open, a reminder toast appears at the reminder time
+- [ ] Sign out → that device stops getting the account's reminders

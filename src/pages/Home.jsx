@@ -16,6 +16,8 @@ import { useLiveRefresh } from '../lib/useLiveRefresh.js'
 import ReminderBanner from '../components/ReminderBanner.jsx'
 import InstallCard from '../components/InstallCard.jsx'
 import GettingStarted from '../components/GettingStarted.jsx'
+import UpcomingEvents from '../components/calendar/UpcomingEvents.jsx'
+import { listUpcomingEvents } from '../lib/events.js'
 import { Card, ErrorNote, Spinner } from '../components/ui.jsx'
 
 const LAST_ROOM_KEY = 'syncora:lastRoom'
@@ -45,6 +47,7 @@ export default function Home() {
   const [composerRoom, setComposerRoom] = useState(readLastRoom)
   const [showLater, setShowLater] = useState(false)
   const [streak, setStreak] = useState(null)
+  const [upcoming, setUpcoming] = useState([])
   const [reactions, setReactions] = useState({})
 
   const refreshStreak = useCallback(() => {
@@ -61,6 +64,10 @@ export default function Home() {
       setTasks(t)
       setEvents(e)
       refreshStreak()
+      // Separate so Home still works before the calendar migration is run.
+      listUpcomingEvents()
+        .then(setUpcoming)
+        .catch(() => setUpcoming([]))
       // Reactions people left on the tasks you finished today.
       listReactionsForTasks(t.filter((x) => x.completed_at).map((x) => x.id))
         .then((rows) => setReactions(groupReactions(rows)))
@@ -83,6 +90,7 @@ export default function Home() {
       { table: 'rooms' },
       { table: 'reactions' },
       { table: 'activity_events' },
+      { table: 'room_events' },
     ],
     load,
   )
@@ -269,6 +277,8 @@ export default function Home() {
               </>
             )}
           </section>
+
+          <UpcomingEvents events={upcoming} />
 
           {/* Rooms */}
           <div>

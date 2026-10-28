@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   formatCode,
@@ -16,6 +16,7 @@ import Avatar from '../components/Avatar.jsx'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import RoomTasks from '../components/tasks/RoomTasks.jsx'
 import RoomActivity from '../components/RoomActivity.jsx'
+import RoomCalendar from '../components/calendar/RoomCalendar.jsx'
 import VotePanel from '../components/VotePanel.jsx'
 import { useLiveRefresh } from '../lib/useLiveRefresh.js'
 import { cancelDeletion, checkRoomDeletion, getOpenRequest, nextAdmin, requestDeletion, voteOnDeletion } from '../lib/deletion.js'
@@ -33,6 +34,9 @@ import {
 
 export default function RoomDetail() {
   const { roomId } = useParams()
+  const [params, setParams] = useSearchParams()
+  const tab = params.get('tab') === 'calendar' ? 'calendar' : 'tasks'
+  const setTab = (next) => setParams(next === 'calendar' ? { tab: 'calendar' } : {}, { replace: true })
   const { user } = useAuth()
   const navigate = useNavigate()
   const [room, setRoom] = useState(undefined) // undefined = loading, null = not found
@@ -69,6 +73,7 @@ export default function RoomDetail() {
       { table: 'activity_events', filter: `room_id=eq.${roomId}` },
       { table: 'deletion_requests', filter: `room_id=eq.${roomId}` },
       { table: 'deletion_votes' },
+      { table: 'room_events', filter: `room_id=eq.${roomId}` },
     ],
     () => {
       load()
@@ -217,7 +222,38 @@ export default function RoomDetail() {
         <InviteCard code={room.join_code} roomName={room.name} isAdmin={isAdmin} onRegenerate={askRegenerate} prominent />
       )}
 
-      <RoomTasks room={room} currentUserId={user.id} liveKey={liveKey} onChange={() => setActivityKey((k) => k + 1)} />
+      <div role="tablist" aria-label="Room sections" className="grid grid-cols-2 gap-1 rounded-2xl bg-surface p-1">
+        {[
+          { id: 'tasks', label: 'Tasks', icon: <TasksIcon /> },
+          { id: 'calendar', label: 'Calendar', icon: <CalendarIcon /> },
+        ].map((t) => (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={tab === t.id}
+            onClick={() => setTab(t.id)}
+            className={`flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-colors ${
+              tab === t.id ? 'bg-brand text-on-brand' : 'text-muted hover:text-ink'
+            }`}
+          >
+            {t.icon}
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'tasks' ? (
+        <RoomTasks room={room} currentUserId={user.id} liveKey={liveKey} onChange={() => setActivityKey((k) => k + 1)} />
+      ) : (
+        <RoomCalendar
+          key={`${room.id}:${params.get('date') ?? ''}`}
+          room={room}
+          meId={user.id}
+          isAdmin={isAdmin}
+          initialDate={params.get('date')}
+          liveKey={liveKey}
+        />
+      )}
 
       <RoomActivity
         roomId={room.id}
@@ -420,5 +456,23 @@ function InviteCard({ code, roomName, isAdmin, onRegenerate, prominent = false }
         {canShare && <PrimaryButton onClick={share}>Share</PrimaryButton>}
       </div>
     </Card>
+  )
+}
+
+function TasksIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="16" rx="3" />
+      <path d="m7.5 12 2.5 2.5 5-5" />
+    </svg>
+  )
+}
+
+function CalendarIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="16" rx="3" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </svg>
   )
 }

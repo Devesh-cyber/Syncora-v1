@@ -9,6 +9,7 @@ const EVENT_FIELDS = `
   actor:profiles!activity_events_actor_id_fkey(id, display_name, avatar_url),
   target:profiles!activity_events_target_user_id_fkey(id, display_name),
   task:tasks(id, title),
+  event:room_events(id, title, starts_at, all_day),
   room:rooms(id, name)
 `
 
@@ -47,6 +48,13 @@ export function describeEvent(event, meId) {
         event.target_user_id === meId ? 'your' : event.target?.display_name ? `${event.target.display_name}'s` : 'a'
       return `${actor} cheered ${event.emoji ?? ''} on ${owner} ${task}`
     }
+    case 'event_added': {
+      if (!event.event) return `${actor} added an event`
+      const when = new Date(event.event.starts_at)
+      const day = when.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
+      const time = event.event.all_day ? 'all day' : when.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+      return `${actor} added “${event.event.title}” · ${day}, ${time}`
+    }
     case 'admin_transferred':
       return `${actor} handed admin to ${target}`
     case 'deletion_requested':
@@ -73,6 +81,7 @@ export function eventIcon(type) {
       deletion_requested: '🗳️',
       deletion_failed: '🗳️',
       deletion_cancelled: '🗳️',
+      event_added: '📅',
     }[type] ?? '•'
   )
 }

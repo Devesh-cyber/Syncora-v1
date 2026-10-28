@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import ProfileForm from '../components/ProfileForm.jsx'
 import InstallCard from '../components/InstallCard.jsx'
+import NotificationsCard from '../components/calendar/NotificationsCard.jsx'
 import { REMINDER_HOUR } from '../components/ReminderBanner.jsx'
 
 export default function Profile() {
@@ -67,6 +68,8 @@ export default function Profile() {
         </div>
         {reminderError && <p className="mt-2 text-sm text-danger">{reminderError}</p>}
       </section>
+
+      <NotificationsCard />
 
       <Link
         to="/tour?replay=1"

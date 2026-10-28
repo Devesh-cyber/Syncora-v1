@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
+import { forgetThisDevice } from '../lib/push.js'
 
 const AuthContext = createContext(null)
 const RETURN_TO_KEY = 'syncora:returnTo'
@@ -79,6 +80,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const signOut = useCallback(async () => {
+    await forgetThisDevice() // stop this account's reminders on this device
     await supabase.auth.signOut()
     setProfile(null)
   }, [])

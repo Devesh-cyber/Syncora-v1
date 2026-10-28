@@ -50,6 +50,12 @@ Syncora sits in between: **individual ownership, shared visibility, friendly acc
 - Otherwise the room **votes** for 48 hours: it's deleted only if more than half say yes
 - If an admin wants to *leave* and the vote fails, admin passes to the longest-standing member
 
+**Shared room calendar**
+- Every room has a **Tasks | Calendar** tab: a month view with dots on busy days; tap a day → **Add event** (title, description, date, time or all-day, reminder)
+- Anyone in the room can add events; the creator and the admin can edit or delete them
+- **Reminders as real push notifications** (at start, 10 min, 1 hour or 1 day before; all-day events at 9 AM), even with the app closed; tapping one opens that day in the room's calendar. Anyone can mute a room's reminders
+- **Upcoming** events across all your rooms on Home; new events show in the room feed
+
 **Easy to start**
 - The sign-in page explains the app in three lines; people arriving from an invite link see *"You've been invited to a room"*
 - A 4-card **"How Syncora works"** tour after the first sign-in (skippable, replayable from Profile), ending in *Create a room* / *Join with a code*, or straight into the room they were invited to
@@ -83,6 +89,7 @@ Syncora sits in between: **individual ownership, shared visibility, friendly acc
 | Realtime | Supabase Realtime (`postgres_changes`) | Live updates that respect RLS |
 | Storage | Supabase Storage (`avatars` bucket) | Profile photos, cropped to 256 px on the device first |
 | App shell | PWA manifest + small service worker | Home-screen install, offline open |
+| Reminders | Web Push (VAPID) + Supabase Edge Function + pg_cron | Notifications with the app closed, no extra server |
 | Hosting | Vercel | Static build, SPA rewrites |
 
 There is **no custom backend server**. The browser talks to Supabase directly, and everything sensitive (joining, removing members, voting, completion timestamps, streaks) runs inside Postgres.
@@ -109,6 +116,8 @@ profiles ──< room_members >── rooms ──< deletion_requests ──< de
 | `reactions` | One row per person per emoji per task |
 | `activity_events` | The room feed: completions, cheers, joins, leaves, votes |
 | `deletion_requests`, `deletion_votes` | Open/closed room-deletion votes |
+| `room_events` | Calendar events: title, description, start, all-day, reminder offset + computed `remind_at` |
+| `push_subscriptions` | One row per device that turned reminders on |
 
 ### Security model
 
@@ -155,6 +164,7 @@ Fill in `.env.local` from Supabase → **Project Settings → API**:
 ```env
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon public key>
+VITE_VAPID_PUBLIC_KEY=<optional, for calendar push — see docs/REMINDERS_SETUP.md>
 ```
 
 ### 2. Set up the database
@@ -170,6 +180,9 @@ In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in ord
 | `007_deletion_votes.sql` | Room deletion votes |
 | `008_realtime.sql` | Realtime publication |
 | `009_onboarding.sql` | "Tour seen" flag for the welcome tour |
+| `010_calendar.sql` | Room calendar, reminders, push subscriptions |
+
+**Calendar push reminders** need a little more one-time setup (VAPID keys, an Edge Function and a 1-minute schedule). Follow [`docs/REMINDERS_SETUP.md`](docs/REMINDERS_SETUP.md). The calendar works without it; reminders then only show while the app is open.
 
 The numbers follow the build phases; phases 1 and 5 needed no SQL, so there are no 001 or 005 files. Optional: the last lines of `007_deletion_votes.sql` show how to close expired votes in the background with `pg_cron`. Without it, a vote is settled when someone next opens the room.
 
@@ -230,9 +243,7 @@ The UI uses the **Ember** dark theme: warm charcoal, an ember-orange accent, Bri
 Deliberately left out of V1, possibly later depending on how the pilot goes:
 
 - Private tasks and per-task visibility
-- Recurring tasks (e.g. "daily revision")
-- Calendar view
-- Real push notifications (the in-app reminder comes first)
+- Recurring tasks and repeating calendar events (e.g. "daily revision", "every Monday standup")
 - Comments on tasks
 - Weekly progress summaries
 
